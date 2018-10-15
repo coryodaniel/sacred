@@ -1,0 +1,11 @@
+auth:
+  token: secret
+  domain: test.atlassian.net
+docs:
+- name: Markdown Test
+  notice: |-
+      <p>Notice!</p>
+  spaceId: test
+  contentId: 1337
+  files:
+  - ./testdata/README.md
