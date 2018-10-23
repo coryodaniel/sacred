@@ -17,14 +17,6 @@ func TestExecute(t *testing.T) {
     if outputDir != "" {
       t.Errorf("expected output directory to be blank by default; got %s", outputDir)
     }
-
-    if verbose {
-      t.Errorf("expeced verbose to be false by default")
-    }
-
-    if dryRun {
-      t.Errorf("expeced dry-run to be false by default")
-    }
   })
 
   t.Run("Reads SACRED_TOKEN from ENV", func(t *testing.T) {

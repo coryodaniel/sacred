@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -12,9 +11,6 @@ const description = "Sacred: Confluence Markdown Uploader"
 
 var cfg Configuration
 var cfgFile string
-var outputDir string
-var verbose bool
-var dryRun bool
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
@@ -35,6 +31,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	RootCmd.AddCommand(UploadCmd)
+	RootCmd.AddCommand(PreviewCmd)
 	RootCmd.AddCommand(versionCmd)
 
 	viper.SetEnvPrefix("SACRED")
@@ -42,9 +39,6 @@ func init() {
 	viper.BindEnv("domain")
 
 	RootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default ./.sacred.yaml)")
-	RootCmd.PersistentFlags().StringVarP(&outputDir, "output", "o", "", "output directory")
-	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "verbose output")
-	RootCmd.PersistentFlags().BoolVar(&dryRun, "dry-run", false, "dry run")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -59,14 +53,11 @@ func initConfig() {
 
 	// read in environment variables that match
 	viper.AutomaticEnv()
+	LoadConfig()
 }
 
 func LoadConfig() {
 	err := viper.ReadInConfig()
-	if err == nil	&& verbose{
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
-	}
-
 	err = viper.Unmarshal(&cfg)
 	if err != nil {
 		log.Printf("Invalid config file: %s\n", cfgFile)

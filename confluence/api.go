@@ -4,16 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
+	"os"
 	"net/http"
 
 	"github.com/dghubble/sling"
 )
-
-type ConfluenceError struct{}
-
-func (e ConfluenceError) Error() string {
-	return fmt.Sprintf("Confluence error: %+v", e)
-}
 
 type ContentService struct {
 	sling *sling.Sling
@@ -40,21 +36,15 @@ func NewContentService(domain string, token string, httpClient *http.Client) *Co
 
 func (c *ContentService) Get(id string) (*Content, *http.Response, error) {
 	content := new(Content)
-	confluenceError := new(ConfluenceError)
 	path := fmt.Sprintf("content/%s", id)
+	resp, err := c.sling.New().Path(path).ReceiveSuccess(content)
+	handleError(resp, err)
 
-	resp, err := c.sling.New().Path(path).
-		Receive(content, confluenceError)
-
-	if err == nil {
-		err = confluenceError
-	}
 	return content, resp, err
 }
 
 func (s *ContentService) Update(id string, contentBody ContentRequest) (*Content, *http.Response, error) {
 	content := new(Content)
-	confluenceError := new(ConfluenceError)
 	path := fmt.Sprintf("content/%s", id)
 
 	buf := new(bytes.Buffer)
@@ -62,14 +52,9 @@ func (s *ContentService) Update(id string, contentBody ContentRequest) (*Content
 	enc.SetEscapeHTML(false)
 	_ = enc.Encode(contentBody)
 
-	resp, err := s.sling.New().Put(path).
-		Body(buf).
-		Set("Content-Type", "application/json").
-		Receive(content, confluenceError)
+	resp, err := s.sling.New().Put(path).Body(buf).ReceiveSuccess(content)
+	handleError(resp, err)
 
-	if err == nil {
-		err = confluenceError
-	}
 	return content, resp, err
 }
 
@@ -91,5 +76,17 @@ func ContentRequestPayload(spaceId string, version int, title string, html strin
 				Representation: "storage",
 			},
 		},
+	}
+}
+
+func handleError(resp *http.Response, err error) {
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
+
+	if resp.StatusCode != 200 {
+		log.Printf("Confluence API Error: %s", resp.Status)
+		os.Exit(1)
 	}
 }

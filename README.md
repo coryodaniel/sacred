@@ -24,7 +24,9 @@ sacred upload
 sacred upload -c path/to/my/config.yaml
 ```
 
-### **Example:** Single Confluence document from a sincle markdown file
+### Config Examples
+
+#### Single Confluence document from a single markdown file
 
 ```yaml
 auth:
@@ -38,7 +40,7 @@ docs:
   - ./README.md
 ```
 
-### **Example:** Multiple Confluence Documents with multiple markdown files
+#### Multiple Confluence Documents with multiple markdown files
 
 ```yaml
 auth:
@@ -70,3 +72,19 @@ Additionally the following environment variables may be set:
 
 * `SACRED_TOKEN` - Override `auth.token`
 * `SACRED_DOMAIN` - Override `auth.domain`
+
+## Creating a Confluence API Token
+
+Create an API token from your Atlassian account:
+
+1.  Log in to https://id.atlassian.com.
+2.  Click API tokens
+3.  Then Create API token
+
+This token can either be set in your `.sacred.yaml` file or in the `SACRED_TOKEN` environment variable.
+
+## Confluence Content and Space Identifiers
+
+The content and space ID can be found in the content URL:
+
+`https://YOUR_DOMAIN.atlassian.net/wiki/spaces/SPACE_ID/pages/CONTENT_ID/Markdown+Test`
